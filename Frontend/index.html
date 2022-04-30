@@ -1,0 +1,44 @@
+<html>
+  <head>
+    <link rel="stylesheet" type="text/css" href="index.css" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script type="text/javascript">
+      function connect() {
+        var ws = new WebSocket("ws://localhost:5328/");
+
+        ws.onopen = function () {
+          console.log("Connected to WebSocket");
+          $("#Count").text(`Notes hit: 0`);
+          ws.send("Ping!");
+        };
+
+        ws.onclose = function () {
+          console.log(
+            "Lost connection to the WebSocket, reconnecting in 5 seconds"
+          );
+          $("#Count").text(`Lost connection to the WebSocket!`);
+          setTimeout(() => {
+            connect();
+          }, 5000);
+        };
+
+        ws.onmessage = function (e) {
+          var json = JSON.parse(e.data);
+          console.log(json);
+          if (!json.count) return;
+          else {
+            $("#Count").text(`Notes hit: ${json.count}`);
+          }
+        };
+      }
+      connect();
+    </script>
+  </head>
+  <body>
+    <b>
+      <h1 id="Count">
+        Not connected or your browser does not support WebSockets
+      </h1>
+    </b>
+  </body>
+</html>
